@@ -3,15 +3,15 @@ import ast
 from bs4 import BeautifulSoup
 import re
 import pandas as pd
-import lxml
 
 # CHECK HSV
 # HS17 : DATA HANYA SAMPAI ID 252610
 # HS12 : DATA HANYA SAMPAI ID 262060
 
 url = "https://exim.kemendag.go.id/home/checkHsV"
-token = "dd57916ea5cb6fc242f06b66ae2287eee8007ddf01ca9c6f75df94cf353b36ba"
-negara_id = '213'
+token = "b4d78cacf9f1226dc03b42800f564ba1fe4cbe32dcae74af08323c68ca4375eb"
+negara_id = '211'
+negara = 'Mesir'
 form_data = {"negara_id": negara_id,"token":token}
 r = requests.post(url,form_data)
 hs_v = r.text
@@ -20,7 +20,7 @@ hs_v = r.text
 url = "https://exim.kemendag.go.id/home/getMasterHS"
 form_data = {'hs_v': hs_v, 'token': token}
 r = requests.post(url, form_data)
-soup = BeautifulSoup(r.text, 'lxml')
+soup = BeautifulSoup(r.text, 'html.parser')
 items = soup.findAll('option')
 
 id_komoditi = []
@@ -60,15 +60,11 @@ for i, k in zip(id_komoditi,nama_komoditi):
     nama_perusahaan.append(d['nama_eksportir'])
     alamat_perusahaan.append(d['alamat_eksportir'])
     email_perusahaan.append(d['email_eksportir'])
-
-    print('nama : ', nama_perusahaan)
-  #   count = count + 1
-  #   print(count)
-  # if count > 1:
+  #   count =+ 1
+  # if count > 0:
   #   break
 
-data_dict = {'Negara':'Maroko', 'Komoditi':komoditi, 'Perusahaan':nama_perusahaan, 'Alamat':alamat_perusahaan, 'Email':email_perusahaan}
+data_dict = {'Negara':negara, 'Komoditi':komoditi, 'Perusahaan':nama_perusahaan, 'Alamat':alamat_perusahaan, 'Email':email_perusahaan}
 df = pd.DataFrame(data_dict,columns= ["Negara","Komoditi","Perusahaan","Alamat","Email"])
 
-df.sort_values('Komoditi', ascending=True)
-df.to_csv('Maroko.csv', sep=',', encoding='utf-8')
+df.to_csv(negara+'.csv', sep=',', encoding='utf-8')
